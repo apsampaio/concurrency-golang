@@ -1,27 +1,25 @@
 package main
 
 import (
-	"io"
-	"os"
-	"strings"
+	"sync"
 	"testing"
 )
 
-func Test_main(t *testing.T) {
-	stdOut := os.Stdout
-	r, w, _ := os.Pipe()
+func Test_CalcBalance(t *testing.T) {
+	var balance sync.Mutex
+	var wg sync.WaitGroup
 
-	os.Stdout = w
+	// define weekly revenue
+	incomes := []Income{
+		{Source: "Main jobs", Amount: 500},
+		{Source: "Gifts", Amount: 10},
+		{Source: "Part time job", Amount: 50},
+		{Source: "Investments", Amount: 100},
+	}
 
-	main()
+	bankBalance := CalcBalance(incomes, &balance, &wg)
 
-	_ = w.Close()
-
-	result, _ := io.ReadAll(r)
-	output := string(result)
-
-	os.Stdout = stdOut
-	if !strings.Contains(output, "$34320.00") {
-		t.Error("wrong balance")
+	if bankBalance != 34320 {
+		t.Error("bank balance different from expected")
 	}
 }

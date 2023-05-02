@@ -5,8 +5,6 @@ import (
 	"sync"
 )
 
-var wg sync.WaitGroup
-
 type Income struct {
 	Source string
 	Amount int
@@ -17,6 +15,7 @@ func main() {
 
 	var bankBalance int
 	var balance sync.Mutex
+	var wg sync.WaitGroup
 
 	// print out starting values
 	fmt.Printf("Initial account balance: $%d.00", bankBalance)
@@ -30,26 +29,32 @@ func main() {
 		{Source: "Investments", Amount: 100},
 	}
 
+	bankBalance = CalcBalance(incomes, &balance, &wg)
+
+	// print out final balance
+	fmt.Printf("Final bank balance: $%d.00", bankBalance)
+}
+
+func CalcBalance(incomes []Income, balance *sync.Mutex, wg *sync.WaitGroup) int {
+	var result int
+
 	wg.Add(len(incomes))
 	// loop through 52 weeks and print out  how much is made; keep a running total
-
 	for i, income := range incomes {
 		go func(i int, income Income) {
 			defer wg.Done()
 			for week := 1; week <= 52; week++ {
 				balance.Lock()
-				temp := bankBalance
+				temp := result
 				temp += income.Amount
-				bankBalance = temp
+				result = temp
 				balance.Unlock()
 
 				fmt.Printf("On week %d, you earned $%d.00 from %s\n", week, income.Amount, income.Source)
 			}
 		}(i, income)
 	}
-
 	wg.Wait()
-	// print out final balance
 
-	fmt.Printf("Final bank balance: $%d.00", bankBalance)
+	return result
 }
