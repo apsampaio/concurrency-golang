@@ -1,0 +1,13 @@
+{
+  "folders": [
+    {
+      "path": "section2",
+      "name": "section 2: Goroutines, the go keyword, and WaitGroups"
+    },
+    {
+      "path": "section3",
+      "name": "section 3: Race Conditions, Mutexes, and an Introduction to Channels"
+    }
+  ],
+  "settings": {}
+}
